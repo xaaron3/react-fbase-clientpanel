@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
+import PropTypes from 'prop-types';
+// import { compose } from 'redux';
+// import { connect } from 'react-redux';
+import { firestoreConnect } from 'react-redux-firebase';
 
 class AddClient extends Component {
    state = {
@@ -8,6 +12,17 @@ class AddClient extends Component {
       email: '',
       phone: '',
       balance: ''
+   }
+
+   onSubmit = e => {
+      e.preventDefault();
+      const {state, props: { firestore, history } } = this
+      const newClient = {
+        ...state,
+        balance: state.balance === '' ? '0' : state.balance
+      }
+     
+      firestore.add({ collection: 'clients' }, newClient).then(() => history.push('/'))
    }
 
    onChange = (e) => {
@@ -28,7 +43,7 @@ class AddClient extends Component {
             <div className="card">
                <div className="card-header">Add Client</div>
                <div className="card-body">
-                  <form>
+                  <form onSubmit={this.onSubmit}>
                      <div className="form-group">
                         <label htmlFor="firstName">First Name</label>
                         <input 
@@ -90,7 +105,10 @@ class AddClient extends Component {
                            />
                      </div>
 
-                     <input type="submit" value="Submit" className="btn btn-primary btn-block" />
+                     <input 
+                        type="submit" 
+                        value="Submit" 
+                        className="btn btn-primary btn-block" />
                   </form>
                </div>
             </div>
@@ -99,4 +117,10 @@ class AddClient extends Component {
    }
 }
 
-export default AddClient;
+AddClient.propTypes = {
+   firestore: PropTypes.object.isRequired
+}
+
+export default firestoreConnect()(AddClient)
+// only connecting to firestore to add a client
+// not getting anything from state to put in props
