@@ -12,8 +12,24 @@ class Clients extends Component {
       totalOwed: null
    }
 
+   static getDerivedStateFromProps(props, state) {
+      const { clients } = props;
+
+      if(clients) {
+         // add balances
+         const total = clients.reduce((total, client) => {
+            return total + parseFloat(client.balance.toString())
+         }, 0)
+
+         return { totalOwed: total }
+      }
+
+      return null;
+   }
+
    render() {
       const {clients} = this.props; 
+      const { totalOwed } = this.state;
 
       if (clients) {
          return (
@@ -26,7 +42,7 @@ class Clients extends Component {
                      <h5 className="text-right text-secondary">
                         TotalOwed{' '}
                         <span className="text-primary">
-                        
+                           ${parseFloat(totalOwed).toFixed(2)}
                         </span>
                      </h5>
                   </div>
